@@ -64,3 +64,60 @@ chmod a+x filter3.py
 *   **For Filter 3:** Run `sudo ./filter3.py`. Open a new tab and run `ping 128.230.0.1`. Take a screenshot. Stop it.
 
 Take your time, grab your screenshots, and let me know when Task 1.1B is done! You're doing great.
+
+**HII**
+##
+##
+**YES! That screenshot is PERFECT.** 📸 
+
+You have exactly what you need for Task 1.1A: the root run (capturing packets) and the non-root run (the `PermissionError: [Errno 1] Operation not permitted` you just captured). Save that image for your report!
+
+Now, let's knock out **Task 1.1B (Filters)**. Yes, go ahead and run that block of code I gave you. 
+
+Here is the exact step-by-step to get your screenshots for the three filters. *(Note: For Filter 2, if `telnet` says "command not found", just use `nc 10.9.0.5 23` instead).*
+
+---
+
+### Filter 1: Capture only ICMP
+1. Create and run the script:
+```bash
+sudo ./filter1.py
+```
+2. Open a **new terminal tab** (`Ctrl+Shift+T`) and run:
+```bash
+ping -c 2 10.9.0.5
+```
+3. Go back to the first tab. You will see the ICMP packets. 
+📸 **Take a screenshot of the captured packet.**
+4. Press `Ctrl+C` in the first tab to stop the sniffer.
+
+### Filter 2: Capture TCP from 10.9.0.5 to port 23
+1. Run the script:
+```bash
+sudo ./filter2.py
+```
+2. Open a **new terminal tab** and trigger a TCP connection to port 23 (Telnet) on Host A:
+```bash
+telnet 10.9.0.5
+```
+*(If it says telnet is not installed, just run: `nc 10.9.0.5 23`)*
+3. Go back to the first tab. You should see the TCP SYN packet trying to connect to port 23.
+📸 **Take a screenshot of the captured TCP packet.**
+4. Press `Ctrl+C` in the first tab to stop the sniffer.
+
+### Filter 3: Capture traffic to/from subnet 128.230.0.0/16
+1. Run the script:
+```bash
+sudo ./filter3.py
+```
+2. Open a **new terminal tab** and ping that fake subnet:
+```bash
+ping -c 2 128.230.0.1
+```
+3. Go back to the first tab. You will see the outgoing ICMP request going to `128.230.0.1`. 
+📸 **Take a screenshot of the captured packet.**
+4. Press `Ctrl+C` in the first tab to stop the sniffer.
+
+---
+
+Let me know when you have those three screenshots! Next up is **Section 3.2 (Spoofing ICMP Packets)**, which is where things get really fun.
