@@ -1,61 +1,66 @@
-Don't panic! I apologize for the confusion. I gave you two different ways to create the file (one using `nano`, one using `cat`), and you pasted both of my messages together. 
+**YES! Your screenshots are absolutely PERFECT.** 📸 
 
-**Ignore the old `nano` instructions.** We are only going to use the copy-paste method. 
+You can clearly see the `ICMP echo-request` and `echo-reply` packets between `10.9.0.1` and `10.9.0.5`. This is exactly what Screenshot 1 needs to be. Save those images for your report.
 
-Also, about the ping: **Yes, you MUST ping a container, not yourself.** If you ping `127.0.0.1`, the traffic stays inside the VM and never touches the `br-` interface. Pinging **10.9.0.5** (Host A) is exactly what you are supposed to do.
+Now, do exactly what you asked:
 
-Here is the **ONE accurate set of instructions**. Copy and paste these exactly, one block at a time. 
-
----
-
-### STEP 1: Create the Script
-Copy this entire block and paste it into your terminal, then press Enter. (I have already put your correct `br-ef011bdcf807` interface name in there):
-
-```bash
-cd ~/Desktop
-cat <<EOF > sniffer.py
-#!/usr/bin/env python3
-from scapy.all import *
-
-def print_pkt(pkt):
-    pkt.show()
-
-pkt = sniff(iface='br-ef011bdcf807', filter='icmp', prn=print_pkt)
-EOF
-chmod a+x sniffer.py
-```
-
-### STEP 2: Run as ROOT
-Run this command:
-```bash
-sudo ./sniffer.py
-```
-*(The terminal will just blink and wait. Do not close it!)*
-
-### STEP 3: Ping Host A (to trigger the traffic)
-1. Press **`Ctrl+Shift+T`** to open a **new terminal tab**.
-2. Type this and press Enter: 
-```bash
-ping -c 4 10.9.0.5
-```
-*(This pings Host A 4 times).*
-
-### STEP 4: Take Screenshot 1
-1. Click back on your **first terminal tab** (where the sniffer is running).
-2. You should see the ICMP packet data printed out. 
-3. **📸 TAKE A SCREENSHOT NOW.** This is your proof that the sniffer works as root.
-4. Press **`Ctrl+C`** in that first tab to stop the sniffer.
-
-### STEP 5: Run WITHOUT ROOT
-Run this command:
+### Step 5: Stop the sniffer and run WITHOUT root
+1. Click on the terminal tab where the sniffer is currently running and press **`Ctrl+C`** to stop it.
+2. Run this command:
 ```bash
 ./sniffer.py
 ```
 
-### STEP 6: Take Screenshot 2
+### Step 6: Take Screenshot 2
 You will immediately see an error that says **`PermissionError: [Errno 1] Operation not permitted`**. 
-**📸 TAKE A SCREENSHOT NOW.** This proves why you need root.
+📸 **Take a screenshot of that error.** This proves why you need root.
 
 ---
 
-Take a breath, do exactly these steps, and let me know when you have **Screenshot 1** and **Screenshot 2**!
+### NEXT: Task 1.1B (Filters)
+
+Once you have that error screenshot, we are going to do **Task 1.1B**. This is super fast; we just change the `filter` part of the code.
+
+**Filter 1: Capture only ICMP (You basically just did this, but let's make a clean script for it).**
+```bash
+cd ~/Desktop
+cat <<EOF > filter1.py
+#!/usr/bin/env python3
+from scapy.all import *
+def print_pkt(pkt):
+    pkt.show()
+pkt = sniff(iface='br-ef011bdcf807', filter='icmp', prn=print_pkt)
+EOF
+chmod a+x filter1.py
+```
+
+**Filter 2: Capture TCP from a specific IP to port 23.**
+```bash
+cat <<EOF > filter2.py
+#!/usr/bin/env python3
+from scapy.all import *
+def print_pkt(pkt):
+    pkt.show()
+pkt = sniff(iface='br-ef011bdcf807', filter='tcp and src host 10.9.0.5 and dst port 23', prn=print_pkt)
+EOF
+chmod a+x filter2.py
+```
+
+**Filter 3: Capture traffic to/from a specific subnet (like 128.230.0.0/16).**
+```bash
+cat <<EOF > filter3.py
+#!/usr/bin/env python3
+from scapy.all import *
+def print_pkt(pkt):
+    pkt.show()
+pkt = sniff(iface='br-ef011bdcf807', filter='net 128.230.0.0/16', prn=print_pkt)
+EOF
+chmod a+x filter3.py
+```
+
+**How to test these and get screenshots:**
+*   **For Filter 1:** Run `sudo ./filter1.py`, open a new tab, and `ping 10.9.0.5`. Take a screenshot. Stop it with `Ctrl+C`.
+*   **For Filter 2:** Run `sudo ./filter2.py`. Open a new tab and run `telnet 10.9.0.5`. (If telnet isn't installed, just run `nc 10.9.0.5 23`). Take a screenshot of the captured packet. Stop it.
+*   **For Filter 3:** Run `sudo ./filter3.py`. Open a new tab and run `ping 128.230.0.1`. Take a screenshot. Stop it.
+
+Take your time, grab your screenshots, and let me know when Task 1.1B is done! You're doing great.
