@@ -121,3 +121,48 @@ ping -c 2 128.230.0.1
 ---
 
 Let me know when you have those three screenshots! Next up is **Section 3.2 (Spoofing ICMP Packets)**, which is where things get really fun.
+
+55
+55
+55
+**Don't worry, you don't need to log in!** 
+
+The fact that you reached the `login:` prompt is **perfect**. It means your VM successfully established a TCP connection to port 23 on Host A, which is exactly the traffic we need to capture. 
+
+Here is what to do right now:
+
+### 1. Stop Telnet
+Go to the tab where telnet is running and press **`Ctrl + ]`** (Control and the right bracket key). Then type `quit` and press Enter to close the connection.
+
+### 2. Take the Screenshot for Filter 2
+Click on the **first tab** (the one running the sniffer). 
+*   If you see TCP packets printed out, **📸 TAKE A SCREENSHOT**.
+*   **⚠️ WARNING:** If the sniffer tab is blank, it's because the filter I gave you was `src host 10.9.0.5`. Since *you* are the one initiating the connection (from the VM), the source is your VM (`10.9.0.1`), not Host A. 
+
+**If the tab is blank, do this quick fix:**
+1. Press `Ctrl+C` in the sniffer tab to stop it.
+2. Run this command to fix the filter to just look for TCP traffic going *to* port 23:
+```bash
+sed -i "s/filter='tcp and src host 10.9.0.5 and dst port 23'/filter='tcp and dst port 23'/" filter2.py
+```
+3. Run the sniffer again: `sudo ./filter2.py`
+4. In your other tab, run `telnet 10.9.0.5` again, and you will see the TCP packets. 
+5. **📸 TAKE A SCREENSHOT** and press `Ctrl+C` to stop the sniffer.
+
+---
+
+### 3. Let's do Filter 3 (Subnet)
+Now for the last filter. 
+
+1. Run the script:
+```bash
+sudo ./filter3.py
+```
+2. Open a **new tab** and run:
+```bash
+ping -c 2 128.230.0.1
+```
+3. Go back to the first tab, and you will see the ICMP packets going to that subnet.
+4. **📸 TAKE A SCREENSHOT** and press `Ctrl+C` to stop the sniffer.
+
+Once you have the screenshots for Filter 2 and Filter 3, **Task 1.1 is completely done!** Let me know when you are ready for Task 1.2 (Spoofing).
