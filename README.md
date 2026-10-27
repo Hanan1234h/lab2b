@@ -1,67 +1,61 @@
-**YES! You are exactly right.** 
+Don't panic! I apologize for the confusion. I gave you two different ways to create the file (one using `nano`, one using `cat`), and you pasted both of my messages together. 
 
-All three containers (`seed-attacker`, `hostA`, `hostB`) started perfectly. 
+**Ignore the old `nano` instructions.** We are only going to use the copy-paste method. 
 
-One small correction: type **`ifconfig`** (with an **f**, not a **p**). `ipconfig` is for Windows, `ifconfig` is for Linux.
+Also, about the ping: **Yes, you MUST ping a container, not yourself.** If you ping `127.0.0.1`, the traffic stays inside the VM and never touches the `br-` interface. Pinging **10.9.0.5** (Host A) is exactly what you are supposed to do.
 
-Run this now:
-```bash
-ifconfig
-```
-
-Look through the output for the interface that starts with **`br-`** (for example, `br-c93733e9f913`). Look to the right of it, and you will see `inet 10.9.0.1`. 
-
-📸 **Screenshot that for your PDF.** Write down the exact `br-...` name, because we are using it in the very next step.
+Here is the **ONE accurate set of instructions**. Copy and paste these exactly, one block at a time. 
 
 ---
 
-### Let's do Task 1.1A (Sniffing)
+### STEP 1: Create the Script
+Copy this entire block and paste it into your terminal, then press Enter. (I have already put your correct `br-ef011bdcf807` interface name in there):
 
-Once you have your `br-...` interface name, we will create the sniffer. 
-
-**1. Create the script:**
-*(Replace `br-XXXXXXXX` with your actual `br-` name!)*
 ```bash
 cd ~/Desktop
-nano sniffer.py
-```
-Paste this inside `nano`:
-```python
+cat <<EOF > sniffer.py
 #!/usr/bin/env python3
 from scapy.all import *
 
 def print_pkt(pkt):
     pkt.show()
 
-pkt = sniff(iface='br-XXXXXXXX', filter='icmp', prn=print_pkt)
-```
-*(Press `Ctrl+O`, `Enter` to save, then `Ctrl+X` to exit).*
-
-Make it executable:
-```bash
+pkt = sniff(iface='br-ef011bdcf807', filter='icmp', prn=print_pkt)
+EOF
 chmod a+x sniffer.py
 ```
 
-**2. Run as root:**
+### STEP 2: Run as ROOT
+Run this command:
 ```bash
 sudo ./sniffer.py
 ```
-*(The terminal will just sit there waiting. Leave it running!)*
+*(The terminal will just blink and wait. Do not close it!)*
 
-**3. Trigger the traffic:**
-Open a **new terminal tab** (Ctrl+Shift+T) and type:
+### STEP 3: Ping Host A (to trigger the traffic)
+1. Press **`Ctrl+Shift+T`** to open a **new terminal tab**.
+2. Type this and press Enter: 
 ```bash
-ping 10.9.0.5
+ping -c 4 10.9.0.5
 ```
-*(You will see the ping working in the new tab, and the first tab will start printing out raw packet data).*
+*(This pings Host A 4 times).*
 
-📸 **Screenshot the first tab** showing the captured packets. 
-*(Go back to the first tab and press `Ctrl+C` to stop the sniffer).*
+### STEP 4: Take Screenshot 1
+1. Click back on your **first terminal tab** (where the sniffer is running).
+2. You should see the ICMP packet data printed out. 
+3. **📸 TAKE A SCREENSHOT NOW.** This is your proof that the sniffer works as root.
+4. Press **`Ctrl+C`** in that first tab to stop the sniffer.
 
-**4. Run without root:**
+### STEP 5: Run WITHOUT ROOT
+Run this command:
 ```bash
 ./sniffer.py
 ```
-📸 **Screenshot the permission error** (this proves why root is required).
 
-Let me know when you have these two screenshots! You are moving fast.
+### STEP 6: Take Screenshot 2
+You will immediately see an error that says **`PermissionError: [Errno 1] Operation not permitted`**. 
+**📸 TAKE A SCREENSHOT NOW.** This proves why you need root.
+
+---
+
+Take a breath, do exactly these steps, and let me know when you have **Screenshot 1** and **Screenshot 2**!
