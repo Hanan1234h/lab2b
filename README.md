@@ -85,3 +85,22 @@ sudo ./sniffer.py
 📸 **SCREENSHOT 6:** Take a screenshot showing the **PermissionError** (Operation not permitted). This proves why root is needed.
 
 Let me know when you have these screenshots! Once you have them, we will do the filters (Task 1.1B) and then move on to the spoofing tasks.
+
+##HI
+That 404 error is frustrating, but you haven't done anything wrong—the SEED lab site sometimes has broken direct links or the page just moved.
+
+You don't need to browse for it. You can download the file directly from the terminal by copying and pasting this single command:
+
+```bash
+wget https://seedsecuritylabs.org/Labs_20.04/Files/Sniffing_Spoofing/Labsetup.zip
+```
+
+This will save `Labsetup.zip` directly into your current folder. 
+
+Once it downloads, you can continue with the setup steps I gave you earlier:
+1.  `unzip Labsetup.zip`
+2.  `cd Labsetup`
+3.  `dcbuild`
+4.  `dcup -d`
+
+Let me know when it finishes downloading and you're ready to find your interface name with `ifconfig`
