@@ -87,20 +87,30 @@ sudo ./sniffer.py
 Let me know when you have these screenshots! Once you have them, we will do the filters (Task 1.1B) and then move on to the spoofing tasks.
 
 ##HI
-That 404 error is frustrating, but you haven't done anything wrong—the SEED lab site sometimes has broken direct links or the page just moved.
+That is a very common issue with the older SEED Ubuntu 20.04 VM. The system's SSL certificates are slightly out of date, so `wget` is refusing to download from the site. 
 
-You don't need to browse for it. You can download the file directly from the terminal by copying and pasting this single command:
+It literally tells you the fix in the last line of the error! We just need to tell it to bypass the certificate check for this one download. 
+
+Copy and paste this exact command:
 
 ```bash
-wget https://seedsecuritylabs.org/Labs_20.04/Files/Sniffing_Spoofing/Labsetup.zip
+wget --no-check-certificate https://seedsecuritylabs.org/Labs_20.04/Files/Sniffing_Spoofing/Labsetup.zip
 ```
 
-This will save `Labsetup.zip` directly into your current folder. 
+Once it downloads successfully, run these commands one by one to set up the lab:
 
-Once it downloads, you can continue with the setup steps I gave you earlier:
-1.  `unzip Labsetup.zip`
-2.  `cd Labsetup`
-3.  `dcbuild`
-4.  `dcup -d`
+```bash
+# 1. Unzip the file
+unzip Labsetup.zip
 
-Let me know when it finishes downloading and you're ready to find your interface name with `ifconfig`
+# 2. Move into the folder
+cd Labsetup
+
+# 3. Build the containers (this might take a minute)
+dcbuild
+
+# 4. Start the containers in the background
+dcup -d
+```
+
+Then, run `ifconfig` and look for the `br-` interface with the IP `10.9.0.1`. Let me know when you get there!
