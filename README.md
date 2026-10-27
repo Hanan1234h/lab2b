@@ -1,60 +1,61 @@
-**PERFECT!** 📸 
+**THIS IS PERFECT!** 📸
 
-You nailed it. The screenshots show the `echo-request` going to `128.230.0.1` and the `echo-reply` coming back. That is exactly what your instructor wants for Filter 3.
+Look at your Wireshark screen—it is absolutely beautiful. You can see exactly what happened:
+*   **Packet 3:** Source `1.2.3.4` sent an ICMP request to `10.9.0.5`. (This is your fake packet!)
+*   **Packet 4:** Host A (`10.9.0.5`) believed the fake IP and sent the reply back to `1.2.3.4`.
 
-**Section 3.1 is officially 100% COMPLETE!** You can stop the sniffer (`Ctrl+C`) and close the extra tabs.
+**Take your screenshot right now.** Make sure Packet #3 is highlighted so the middle pane shows the IP header details, or just capture the whole list showing packets 3 and 4. Save this for your report. 
 
-Now, let's move on to the really fun part: **Section 3.2 - Task 1.2: Spoofing ICMP Packets.**
+*(Note: Packet 1 is an ARP request from your VM asking for the MAC address of Host A before sending the fake packet. That's normal).*
 
-In this task, you are going to forge an ICMP packet with a fake source IP address and send it to Host A (`10.9.0.5`). We will use **Wireshark** to prove that the packet was sent with the fake IP.
+---
 
-### Step 1: Open Wireshark
-1. In your Ubuntu VM, open **Wireshark** (you can find it in the Applications menu or by typing `sudo wireshark` in the terminal).
-2. Select your `br-ef011bdcf807` interface and double-click it to start capturing. (It might ask for your password, `dees`).
-3. Let it run in the background. We will come back to it.
+### NEXT: Section 3.3 - Task 1.3 (Traceroute)
 
-### Step 2: Create the Spoofing Script
-Go back to your terminal and create this script. I have already set the fake source IP to `1.2.3.4` and the destination to Host A (`10.9.0.5`).
+Now we are going to write a mini-traceroute program. The goal is to send packets with a TTL (Time To Live) of 1, 2, 3, etc., and see which router IP responds with a "Time Exceeded" error.
+
+You can close Wireshark for now (or leave it running if you want to capture the traceroute traffic, but it's not strictly required for the screenshot—the terminal output is what matters).
+
+**Step 1: Create the script**
+Copy and paste this into your terminal. This script automatically loops through TTLs 1 to 15 and prints the IP address of each router it hits:
 
 ```bash
 cd ~/Desktop
-cat <<EOF > spoof.py
+cat <<EOF > traceroute.py
 #!/usr/bin/env python3
 from scapy.all import *
 
-# Create the IP packet with a fake source IP
-a = IP()
-a.dst = '10.9.0.5'
-a.src = '1.2.3.4'
+target = '8.8.8.8'
 
-# Create the ICMP echo request
-b = ICMP()
-
-# Stack them and send
-p = a/b
-send(p)
+for ttl in range(1, 16):
+    # Create IP packet with increasing TTL
+    a = IP(dst=target, ttl=ttl)
+    b = ICMP()
+    
+    # Send packet and wait for 1 reply (timeout after 2 seconds)
+    reply = sr1(a/b, verbose=0, timeout=2)
+    
+    if reply is None:
+        print(f"{ttl} : * * * (No response)")
+    else:
+        # Print the IP of the router that replied
+        print(f"{ttl} : {reply.src}")
+        
+        # If the reply is an Echo Reply (type 0), we reached the destination
+        if reply.type == 0:
+            print("Reached destination!")
+            break
 EOF
-chmod a+x spoof.py
+chmod a+x traceroute.py
 ```
 
-### Step 3: Run the Script
-Run the script as root:
+**Step 2: Run the script**
 ```bash
-sudo ./spoof.py
+sudo ./traceroute.py
 ```
-*(You should see `Sent 1 packets.` printed on the screen).*
+*(It will take a few seconds to run as it waits for responses).*
 
-### Step 4: Stop Wireshark and Take Screenshot
-1. Go back to **Wireshark** and click the red square **Stop** button at the top left.
-2. Look at the captured packets. You should see an **ICMP Echo (ping) request**.
-3. Click on that packet.
-4. Look at the **middle pane** (the IP header details). You should see **`Source: 1.2.3.4`** and **`Destination: 10.9.0.5`**.
+**Step 3: Take Screenshot**
+📸 **Take a screenshot of the terminal output.** It should show a list of IP addresses (e.g., `1 : 10.0.2.2`, `2 : 192.168.x.x`, etc.) showing the path your packets took to reach Google (`8.8.8.8`). 
 
-📸 **SCREENSHOT TIME:**
-Take a screenshot of Wireshark showing:
-- The packet list at the top.
-- The `Source: 1.2.3.4` in the middle pane.
-
-*(Note: Depending on how the network routes the fake reply, you might also see an Echo Reply coming back to `1.2.3.4`. If you see it, include it in the screenshot!).*
-
-Save that screenshot and let me know when it's done! We are flying through this now. Next up is **Task 1.3 (Traceroute)**.
+Save that screenshot, and let me know when you're done! We are almost at the finish line—the final task (Task 1.4) is next!
