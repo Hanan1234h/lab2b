@@ -87,17 +87,13 @@ sudo ./sniffer.py
 Let me know when you have these screenshots! Once you have them, we will do the filters (Task 1.1B) and then move on to the spoofing tasks.
 
 ##HI
-That is a very common issue with the older SEED Ubuntu 20.04 VM. The system's SSL certificates are slightly out of date, so `wget` is refusing to download from the site. 
+**Yes, it downloaded successfully!** You can see the `200 OK` and `'Labsetup.zip' saved [1006/1006]` at the bottom. 
 
-It literally tells you the fix in the last line of the error! We just need to tell it to bypass the certificate check for this one download. 
+*(Note: 1006 bytes is very small, but that is normal for this specific lab because it only contains configuration files, not large operating system images).*
 
-Copy and paste this exact command:
+**Yes, go ahead and run those exact 4 commands you typed out.** 
 
-```bash
-wget --no-check-certificate https://seedsecuritylabs.org/Labs_20.04/Files/Sniffing_Spoofing/Labsetup.zip
-```
-
-Once it downloads successfully, run these commands one by one to set up the lab:
+Here is the block again for easy copy-pasting:
 
 ```bash
 # 1. Unzip the file
@@ -106,11 +102,21 @@ unzip Labsetup.zip
 # 2. Move into the folder
 cd Labsetup
 
-# 3. Build the containers (this might take a minute)
+# 3. Build the containers (this will take a few minutes)
 dcbuild
 
 # 4. Start the containers in the background
 dcup -d
 ```
 
-Then, run `ifconfig` and look for the `br-` interface with the IP `10.9.0.1`. Let me know when you get there!
+### ⚠️ What to watch out for:
+If you get an error during `unzip` that says something like *"End-of-central-directory signature not found"*, it means the website sent you a broken/HTML file instead of the real zip. Let me know if that happens, and I'll give you the direct GitHub link to download it instead.
+
+### Next Step (after `dcup -d` finishes):
+Once the containers are running in the background, you need to find your network interface. Run this:
+```bash
+ifconfig
+```
+Look for the interface starting with **`br-`** that has `inet 10.9.0.1`. 
+
+📸 **Take a screenshot of that `ifconfig` output!** You will need that `br-...` name for the Scapy scripts. Let me know when you have it!
