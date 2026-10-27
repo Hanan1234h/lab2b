@@ -92,3 +92,48 @@ When you do Ping 3 (`10.9.0.99`), it will fail. In your report, you **must** exp
 > "Ping 3 to `10.9.0.99` failed because `10.9.0.99` is on the same local area network (LAN) as Host A. Before Host A can send an ICMP echo request to a LAN IP, it must first use ARP to find the MAC address of `10.9.0.99`. Since the machine does not exist, no one replies to the ARP request. Because the MAC address cannot be resolved, the operating system never sends the ICMP echo request onto the network. Therefore, our sniffing program never sees the packet and cannot spoof a reply. In contrast, Pings 1 and 2 were routed to the default gateway, so the ICMP packets were sent out immediately and our sniffer was able to catch and reply to them."
 
 Let me know when you have all those screenshots! You're almost done!
+
+##HAAAAAA
+###
+##HAAAA
+**Don't panic! Your sniffer output is 100% PERFECT.** 📸
+
+Look closely at your screenshots: the sniffer caught `1.2.3.4` and `8.8.8.8`, but it **did not catch `10.9.0.99`**. 
+
+This is exactly what is supposed to happen! It means the packet was never sent out onto the network. 
+
+The "failed part" is happening in your **other terminal tab** (the one where you are inside the Host A container and running the actual `ping` command). 
+
+Here is what you need to do right now:
+
+### 1. Go to your Host A terminal
+Click on the terminal tab where you ran `docksh 62cf` (the one where your prompt looks like `root@62cf11b7afe5:/#`).
+
+### 2. Run the ping to the non-existent LAN host again
+Type this and press Enter:
+```bash
+ping -c 3 10.9.0.99
+```
+*(It might take a few seconds, but eventually, it will fail).* 
+
+You will see an error message that says **`Destination Host Unreachable`** or **`100% packet loss`**. 
+
+📸 **Take a screenshot of this failed ping.** This is the proof your instructor needs.
+
+### 3. Run the routing command
+While still in that container, run this and take a screenshot:
+```bash
+ip route get 1.2.3.4
+```
+
+---
+
+### Why this happened (Put this in your report!)
+Your sniffer script works perfectly. The reason it didn't catch `10.9.0.99` is because of **ARP** (Address Resolution Protocol). 
+
+Here is the explanation you should copy into your report:
+
+> **Why did ping 10.9.0.99 fail?**
+> When Host A tries to ping `10.9.0.99` (an IP on the local LAN), it must first find the MAC address of `10.9.0.99` using an ARP request. Since `10.9.0.99` does not exist, no machine replies to the ARP request. Because the MAC address cannot be resolved, Host A's operating system never generates or sends the ICMP Echo Request packet onto the wire. Since the packet is never sent, our sniff-and-spoof program (which only looks for ICMP packets) never sees it, and therefore cannot spoof a reply. For `1.2.3.4` and `8.8.8.8`, the destination is off-network, so Host A immediately sends the ICMP packet to the default gateway (the VM), allowing our sniffer to intercept and spoof it.
+
+Get those final screenshots of the failed ping and the `ip route get` command, and you are officially done with the lab tasks!
